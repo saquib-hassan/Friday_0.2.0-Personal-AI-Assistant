@@ -30,4 +30,18 @@ class Memory:
         
 
     def get_history(self):
-        pass
+
+        """
+        Docstring for get_history
+        
+        LLMs don't understand json objects, they undrstand plain text
+        
+        """
+
+        text = ""
+        for item in self.history:
+            role = item["role"]
+            message = item["message"]
+            text += f"{role}: {message}\n"
+
+        return text
