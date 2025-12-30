@@ -6,5 +6,13 @@
   {
     "role": "assistant",
     "message": "Hi there! I'm Friday, your AI tutor.\n\nWhat can I help you learn or practice today? Just let me know what subject or topic you have in mind!"
+  },
+  {
+    "role": "user",
+    "message": "what is 2 + 2"
+  },
+  {
+    "role": "assistant",
+    "message": "That's a great question to start with!\n\n2 + 2 = **4**\n\nIs there anything else you'd like to practice with numbers, or perhaps move on to a different topic?"
   }
 ]

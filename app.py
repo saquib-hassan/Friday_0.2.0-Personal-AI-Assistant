@@ -69,3 +69,11 @@ def listen_from_mic():
 
 if st.button("🎤 Speak"):
     user_input = listen_from_mic()
+
+    if user_input:
+        st.chat_message("user").write(user_input)
+
+        response = assistant.respond(user_input, role)
+
+        st.chat_message("assistant").write(response)
+
