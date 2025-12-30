@@ -7,6 +7,12 @@ This project demonstrates **OOP principles**, **LLM integration**, **conversatio
 
 ---
 
+### Video Link:
+
+https://drive.google.com/file/d/1jrOWhF9z16XFt169xUGtSbPrBNwkrSxL/view?usp=sharing
+
+---
+
 ## 🎯 Features
 
 - 💬 Chat-based AI assistant using Google Gemini
