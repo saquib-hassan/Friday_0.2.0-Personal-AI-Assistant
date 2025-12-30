@@ -3,45 +3,34 @@ import json
 
 class Memory:
     def __init__(self):
-        self.file_path = "H://Friday_0.2.0-Personal-AI-Assistant//assistant//memory.json"
+        base_dir = os.path.dirname(__file__)
+        self.file_path = os.path.join(base_dir, "memory.json")
+
         self.history = []
+
         if os.path.exists(self.file_path):
-            with open(self.file_path,"r") as j:
-               self.history= json.load(j)
-        else:
-            self.history = []
+            try:
+                with open(self.file_path, "r", encoding="utf-8") as f:
+                    self.history = json.load(f)
+            except json.JSONDecodeError:
+                self.history = []
 
-    
-    def add(self,role,message):
-        """
-        Docstring for add
-        
-        :param self: It expects an obeject
-        :param role: User role
-        :param message: I've created a message dictionary and appened it to history list and 
-                        open json as write mode and save the history later.
-        """
-        self.message = {"role":role, "message": message}
-        self.history.append(self.message)
+    def add(self, role, message):
 
-        with open(self.file_path,"w") as w:
-            json.dump(self.history,w)
+        entry = {
+            "role": role,
+            "message": message
+        }
 
-        
+        self.history.append(entry)
+
+        with open(self.file_path, "w", encoding="utf-8") as f:
+            json.dump(self.history, f, indent=2)
 
     def get_history(self):
 
-        """
-        Docstring for get_history
-        
-        LLMs don't understand json objects, they undrstand plain text
-        
-        """
-
         text = ""
         for item in self.history:
-            role = item["role"]
-            message = item["message"]
-            text += f"{role}: {message}\n"
+            text += f"{item['role']}: {item['message']}\n"
 
         return text
