@@ -130,7 +130,7 @@ https://drive.google.com/file/d/1jrOWhF9z16XFt169xUGtSbPrBNwkrSxL/view?usp=shari
 ### 1️⃣ Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/Friday.git
+git clone https://github.com/saquib-hassan/Friday.git
 cd Friday
 ```
 
