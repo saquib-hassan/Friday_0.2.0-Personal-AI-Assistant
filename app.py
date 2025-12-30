@@ -6,6 +6,8 @@ documentation: https://docs.streamlit.io/
 app.py = wiring + UI
 
 """
+import speech_recognition as sr
+#interanlly using pyaudio-0.2.14
 
 import streamlit as st
 
@@ -51,3 +53,19 @@ if user_input:
     response = assistant.respond(user_input, role)
     st.chat_message("assistant").write(response)
 
+#STT
+def listen_from_mic():
+    recognizer = sr.Recognizer()
+
+    with sr.Microphone() as source:
+        st.info("🎤 Friday is listening...")
+        recognizer.adjust_for_ambient_noise(source)
+        audio = recognizer.listen(source)
+
+    try:
+        return recognizer.recognize_google(audio)
+    except sr.UnknownValueError:
+        return ""
+
+if st.button("🎤 Speak"):
+    user_input = listen_from_mic()
