@@ -85,7 +85,7 @@ def listen_from_mic():
         return ""
 
 
-
+#streaming output
 if st.button("🎤 Speak"):
     user_input = listen_from_mic()
 
@@ -101,3 +101,22 @@ if st.button("🎤 Speak"):
             for chunk in stream_text(response):
                 streamed_text += chunk
                 placeholder.markdown(streamed_text)
+
+
+#chat exportation
+
+st.sidebar.markdown("---")
+st.sidebar.subheader("📤 Export Conversation")
+
+if st.sidebar.button("Download Chat (.txt)"):
+    chat_text = memory.get_history()
+
+    if chat_text.strip() == "":
+        st.sidebar.warning("No conversation to export.")
+    else:
+        st.download_button(
+            label="📄 Click to Download",
+            data=chat_text,
+            file_name="friday_chat.txt",
+            mime="text/plain"
+        )
