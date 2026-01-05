@@ -1,29 +1,15 @@
-
-"""
-Streamlit
-documentation: https://docs.streamlit.io/
-
-app.py = wiring + UI
-"""
-
-import time
-import speech_recognition as sr
 import streamlit as st
+
+from voice.tts import Speaker
 
 from config.settings import Settings
 from assistant.memory import Memory
 from assistant.prompt_controller import PromptController
 from assistant.llm_engine import LLMEngine
 from assistant.assistant import FridayAssistant
-from db.database import Database
 
-st.set_page_config(
-    page_title="Friday AI Assistant",
-    page_icon="🤖",
-    layout="centered"
-)
-
-st.title("🤖 Friday – Personal AI Assistant")
+st.set_page_config(page_title="Friday AI", page_icon="🤖")
+st.title("🤖 Friday - Personal AI Assistant")
 
 settings = Settings()
 memory = Memory()
@@ -36,23 +22,20 @@ assistant = FridayAssistant(
     memory=memory
 )
 
+# Speaker TTS
+speaker = Speaker()
+
 role = st.sidebar.selectbox(
-    "Select Assistant Role",
+    "Assistant Role",
     ["Tutor", "Coder", "Mentor"]
 )
 
-if st.sidebar.button("🗑️ Clear Memory"):
+if st.sidebar.button("🗑 Clear Memory"):
     memory.history = []
     with open(memory.file_path, "w") as f:
         f.write("[]")
-    st.sidebar.success("Memory cleared!")
+    st.sidebar.success("Memory cleared")
 
-def stream_text(text, delay=0.03):
-    for word in text.split():
-        yield word + " "
-        time.sleep(delay)
-
-#Text Input
 user_input = st.chat_input("Ask Friday...")
 
 if user_input:
@@ -60,102 +43,6 @@ if user_input:
 
     response = assistant.respond(user_input, role)
 
-    with st.chat_message("assistant"):
-        placeholder = st.empty()
-        streamed_text = ""
+    st.chat_message("assistant").write(response)
 
-        for chunk in stream_text(response):
-            streamed_text += chunk
-            placeholder.markdown(streamed_text)
-
-#STT
-def listen_from_mic():
-    recognizer = sr.Recognizer()
-    status = st.empty()
-
-    with sr.Microphone() as source:
-        status.info("🎤 Friday is listening...")
-        recognizer.adjust_for_ambient_noise(source)
-        audio = recognizer.listen(source)
-
-    status.empty()
-
-    try:
-        return recognizer.recognize_google(audio)
-    except sr.UnknownValueError:
-        return ""
-
-
-#streaming output
-if st.button("🎤 Speak"):
-    user_input = listen_from_mic()
-
-    if user_input:
-        st.chat_message("user").write(user_input)
-
-        response = assistant.respond(user_input, role)
-
-        with st.chat_message("assistant"):
-            placeholder = st.empty()
-            streamed_text = ""
-
-            for chunk in stream_text(response):
-                streamed_text += chunk
-                placeholder.markdown(streamed_text)
-
-
-#chat exportation
-
-st.sidebar.markdown("---")
-st.sidebar.subheader("📤 Export Conversation")
-
-if st.sidebar.button("Download Chat (.txt)"):
-    chat_text = memory.get_history()
-
-    if chat_text.strip() == "":
-        st.sidebar.warning("No conversation to export.")
-    else:
-        st.download_button(
-            label="📄 Click to Download",
-            data=chat_text,
-            file_name="friday_chat.txt",
-            mime="text/plain"
-        )
-
-
-
-
-
-
-#db
-def create_tables():
-    from db.database import Database
-
-    db = Database()
-
-    create_users_table = """
-    CREATE TABLE IF NOT EXISTS users (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        email VARCHAR(255) UNIQUE NOT NULL,
-        password VARCHAR(255) NOT NULL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
-    """
-
-    db.execute(create_users_table)
-    db.close()
-
-    print("Database & users table ready")
-
-# database is initialized once per sesion
-if "db_initialized" not in st.session_state:
-    create_tables()
-    st.session_state.db_initialized = True
-
-
-
-
-# if __name__ == "__main__":
-#     create_tables()
-
-
+    speaker.speak(response)

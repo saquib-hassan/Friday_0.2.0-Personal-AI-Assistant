@@ -1,6 +1,9 @@
 streamlit
+pyttsx3
+pyaudio
 google-generativeai
 python-dotenv
 SpeechRecognition
 mysql-connector-python
+bcrypt
 

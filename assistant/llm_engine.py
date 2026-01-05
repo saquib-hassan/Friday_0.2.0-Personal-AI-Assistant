@@ -1,12 +1,8 @@
-
 import google.generativeai as genai
-
 
 class LLMEngine:
     """
-    Handles interaction with the LLM (Gemini).
-    Input: prompt (str)
-    Output: generated text (str)
+    Handles communication with Gemini
     """
 
     def __init__(self, settings):
@@ -16,5 +12,3 @@ class LLMEngine:
     def generate(self, prompt: str) -> str:
         response = self.model.generate_content(prompt)
         return response.text
-
-
