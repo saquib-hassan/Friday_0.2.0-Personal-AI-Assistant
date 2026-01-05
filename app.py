@@ -70,3 +70,26 @@ if text_input:
 
     response = assistant.respond(text_input, role)
     st.chat_message("assistant").write(response)
+
+
+def export_chat_as_text(memory):
+    text = ""
+    for item in memory.history:
+        role = item["role"].capitalize()
+        message = item["message"]
+        text += f"{role}: {message}\n\n"
+    return text
+
+
+st.sidebar.markdown("---")
+
+if st.sidebar.button("📤 Export Chat"):
+    chat_text = export_chat_as_text(memory)
+
+    st.sidebar.download_button(
+        label="⬇️ Download chat.txt",
+        data=chat_text,
+        file_name="friday_chat.txt",
+        mime="text/plain"
+    )
+
