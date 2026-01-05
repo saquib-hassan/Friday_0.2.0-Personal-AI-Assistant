@@ -6,6 +6,8 @@ from assistant.memory import Memory
 from assistant.prompt_controller import PromptController
 from assistant.llm_engine import LLMEngine
 from assistant.assistant import FridayAssistant
+from auth.auth_service import AuthService
+
 
 st.set_page_config(page_title="Friday AI", page_icon="🤖")
 st.title("🤖 Friday - Personal AI Assistant")
@@ -93,3 +95,32 @@ if st.sidebar.button("📤 Export Chat"):
         mime="text/plain"
     )
 
+
+if "authenticated" not in st.session_state:
+    st.session_state.authenticated = False
+
+if not st.session_state.authenticated:
+    st.subheader("🔐 Login to Friday")
+
+    email = st.text_input("Email")
+    password = st.text_input("Password", type="password")
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        if st.button("Login"):
+            if AuthService.login(email, password):
+                st.session_state.authenticated = True
+                st.success("Logged in successfully")
+                st.rerun()
+            else:
+                st.error("Invalid credentials")
+
+    with col2:
+        if st.button("Sign Up"):
+            if AuthService.register(email, password):
+                st.success("Account created. Please login.")
+            else:
+                st.error("User already exists")
+
+    st.stop()

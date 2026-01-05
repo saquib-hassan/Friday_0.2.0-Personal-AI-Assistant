@@ -1,24 +1,29 @@
-from db.database import Database
+import mysql.connector
+from config.settings import Settings
 
+settings = Settings()
 
-def create_tables():
-    db = Database()
+conn = mysql.connector.connect(
+    host=settings.db_host,
+    user=settings.db_user,
+    password=settings.db_password
+)
+cursor = conn.cursor()
 
-    create_users_table = """
-    CREATE TABLE IF NOT EXISTS users (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        email VARCHAR(255) UNIQUE NOT NULL,
-        password VARCHAR(255) NOT NULL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
-    """
+cursor.execute(f"CREATE DATABASE IF NOT EXISTS {settings.db_name}")
+cursor.execute(f"USE {settings.db_name}")
 
-    db.execute(create_users_table)
-    db.close()
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)
+""")
 
-    print("Database & users table ready")
+conn.commit()
+cursor.close()
+conn.close()
 
-
-if __name__ == "__main__":
-    create_tables()
-
+print("Database & users table created")
