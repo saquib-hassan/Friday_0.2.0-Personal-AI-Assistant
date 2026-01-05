@@ -147,9 +147,15 @@ def create_tables():
 
     print("Database & users table ready")
 
-
-
-if __name__ == "__main__":
+# database is initialized once per sesion
+if "db_initialized" not in st.session_state:
     create_tables()
+    st.session_state.db_initialized = True
+
+
+
+
+# if __name__ == "__main__":
+#     create_tables()
 
 
