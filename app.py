@@ -8,7 +8,6 @@ from assistant.llm_engine import LLMEngine
 from assistant.assistant import FridayAssistant
 from auth.auth_service import AuthService
 
-
 st.set_page_config(page_title="Friday AI", page_icon="🤖")
 st.title("🤖 Friday - Personal AI Assistant")
 
@@ -124,3 +123,22 @@ if not st.session_state.authenticated:
                 st.error("User already exists")
 
     st.stop()
+
+
+
+
+
+
+st.sidebar.subheader("🔐 Register")
+
+email = st.sidebar.text_input("Email")
+password = st.sidebar.text_input("Password", type="password")
+
+if st.sidebar.button("Register"):
+    user_service = UserService()
+    success = user_service.register_user(email, password)
+
+    if success:
+        st.sidebar.success("Account created successfully!")
+    else:
+        st.sidebar.error("Email already exists or error occurred")
