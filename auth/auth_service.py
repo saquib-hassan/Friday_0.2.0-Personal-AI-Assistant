@@ -4,10 +4,14 @@ from db.database import Database
 
 class AuthService:
     """
-    Handles user authentication logic
+    Handles user authentication:
+    - register
+    - login
     """
 
     def register_user(self, email: str, password: str) -> bool:
+        email = email.strip().lower()
+
         password_hash = bcrypt.hashpw(
             password.encode("utf-8"),
             bcrypt.gensalt()
@@ -22,6 +26,7 @@ class AuthService:
 
         try:
             db.execute(query, (email, password_hash))
+            db.commit()
             return True
         except Exception as e:
             print("Registration error:", e)
@@ -30,11 +35,20 @@ class AuthService:
             db.close()
 
     def login_user(self, email: str, password: str) -> bool:
+        email = email.strip().lower()
+
         db = Database()
 
-        query = "SELECT password_hash FROM users WHERE email = %s"
+        query = """
+        SELECT password_hash
+        FROM users
+        WHERE email = %s
+        """
+
         user = db.fetch_one(query, (email,))
         db.close()
+
+        print("DEBUG user:", user)
 
         if not user:
             return False
