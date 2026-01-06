@@ -29,7 +29,7 @@ class AuthService:
             db.commit()
             return True
         except Exception as e:
-            print("Registration error:", e)
+            # print("Registration error:", e)
             return False
         finally:
             db.close()
@@ -48,7 +48,7 @@ class AuthService:
         user = db.fetch_one(query, (email,))
         db.close()
 
-        print("DEBUG user:", user)
+        # print("DEBUG user:", user)
 
         if not user:
             return False
