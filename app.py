@@ -135,10 +135,30 @@ email = st.sidebar.text_input("Email")
 password = st.sidebar.text_input("Password", type="password")
 
 if st.sidebar.button("Register"):
-    user_service = UserService()
+    user_service = AuthService()
     success = user_service.register_user(email, password)
 
     if success:
         st.sidebar.success("Account created successfully!")
     else:
         st.sidebar.error("Email already exists or error occurred")
+
+
+#login
+
+auth_service = AuthService()
+
+if st.button("Login"):
+    if auth_service.login_user(email, password):
+        st.success("Logged in successfully")
+        st.session_state["authenticated"] = True
+    else:
+        st.error("Invalid email or password")
+
+#register
+
+if st.button("Register"):
+    if auth_service.register_user(email, password):
+        st.success("Account created")
+    else:
+        st.error("Registration failed")
