@@ -13,11 +13,19 @@ st.set_page_config(page_title="Friday AI", page_icon="🤖")
 st.title("🤖 Friday - Personal AI Assistant")
 
 
+# Initialize session state
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
+if "user_id" not in st.session_state:
+    st.session_state.user_id = None
+if "user_email" not in st.session_state:
+    st.session_state.user_email = None
+if "confirm_logout" not in st.session_state:
+    st.session_state.confirm_logout = False
 
 auth_service = AuthService()
 
+# Login/Register screen
 if not st.session_state.authenticated:
     st.subheader("🔐 Login to Friday")
 
@@ -28,8 +36,12 @@ if not st.session_state.authenticated:
 
     with col1:
         if st.button("Login"):
-            if auth_service.login_user(email, password):
+            result = auth_service.login_user(email, password)
+            if result:
+                user_id, user_email = result
                 st.session_state.authenticated = True
+                st.session_state.user_id = user_id
+                st.session_state.user_email = user_email
                 st.success("Logged in successfully")
                 st.rerun()
             else:
@@ -45,9 +57,10 @@ if not st.session_state.authenticated:
     st.stop()
 
 
+# ===== AUTHENTICATED USER AREA =====
 
 settings = Settings()
-memory = Memory()
+memory = Memory(user_id=st.session_state.user_id)
 prompt_controller = PromptController()
 llm_engine = LLMEngine(settings)
 
@@ -57,24 +70,49 @@ assistant = FridayAssistant(
     memory=memory
 )
 
-# Sidebar
+# Sidebar - User info
+st.sidebar.markdown(f"### 👤 {st.session_state.user_email}")
+st.sidebar.markdown("---")
+
+# Sidebar - Role selection
 role = st.sidebar.selectbox(
     "Assistant Role",
     ["Tutor", "Coder", "Mentor"]
 )
 
+# Sidebar - Clear memory (user-only)
 if st.sidebar.button("🗑 Clear Memory"):
-    memory.history = []
-    with open(memory.file_path, "w") as f:
-        f.write("[]")
+    memory.clear()
     st.sidebar.success("Memory cleared")
-
-if st.sidebar.button("🚪 Logout"):
-    st.session_state.authenticated = False
     st.rerun()
 
+# Sidebar - Logout with confirmation
+if not st.session_state.confirm_logout:
+    if st.sidebar.button("🚪 Logout"):
+        st.session_state.confirm_logout = True
+        st.rerun()
+else:
+    st.sidebar.warning("Are you sure you want to logout?")
+    col1, col2 = st.sidebar.columns(2)
+    with col1:
+        if st.button("Yes", key="logout_yes"):
+            st.session_state.authenticated = False
+            st.session_state.user_id = None
+            st.session_state.user_email = None
+            st.session_state.confirm_logout = False
+            st.rerun()
+    with col2:
+        if st.button("No", key="logout_no"):
+            st.session_state.confirm_logout = False
+            st.rerun()
 
-# STT
+
+# Display existing conversation history
+for item in memory.history:
+    st.chat_message(item["role"]).write(item["message"])
+
+
+# STT - Speech to text
 def listen_from_mic():
     recognizer = sr.Recognizer()
     status = st.empty()
@@ -91,6 +129,7 @@ def listen_from_mic():
     except sr.UnknownValueError:
         st.warning("Sorry, I couldn't understand.")
         return ""
+
 
 # Voice input button
 if st.button("🎤 Speak"):
@@ -115,10 +154,11 @@ if text_input:
 def export_chat_as_text(memory):
     text = ""
     for item in memory.history:
-        role = item["role"].capitalize()
+        role_name = item["role"].capitalize()
         message = item["message"]
-        text += f"{role}: {message}\n\n"
+        text += f"{role_name}: {message}\n\n"
     return text
+
 
 st.sidebar.markdown("---")
 
