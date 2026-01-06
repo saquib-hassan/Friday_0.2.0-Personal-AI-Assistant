@@ -20,7 +20,9 @@ https://drive.google.com/file/d/1jrOWhF9z16XFt169xUGtSbPrBNwkrSxL/view?usp=shari
   - Tutor
   - Coding Assistant
   - Career Mentor
-- 🗂 Persistent conversation memory (JSON-based)
+- 🔐 User authentication (Register/Login with bcrypt)
+- 🗂 Persistent conversation memory (MySQL database)
+- 👤 User-specific conversations (each user sees only their chats)
 - 🎤 Voice input (Speech-to-Text)
 - 📤 Export conversation as `.txt`
 - 🧱 Clean OOP architecture
@@ -34,6 +36,8 @@ https://drive.google.com/file/d/1jrOWhF9z16XFt169xUGtSbPrBNwkrSxL/view?usp=shari
 - **Python 3.10+**
 - **Streamlit**
 - **Google Gemini API**
+- **MySQL** (conversation storage & user auth)
+- **bcrypt** (password hashing)
 - **speechrecognition + PyAudio**
 - **python-dotenv**
 - **Object-Oriented Programming (OOP)**
@@ -61,7 +65,8 @@ https://drive.google.com/file/d/1jrOWhF9z16XFt169xUGtSbPrBNwkrSxL/view?usp=shari
 
 ### 2️⃣ `Memory`
 
-- Stores conversation in `memory.json`
+- Stores conversation in MySQL `conversations` table
+- User-specific: each user only sees their own chats
 - Converts history to plain text for LLMs
 
 ### 3️⃣ `PromptController`
@@ -90,9 +95,12 @@ https://drive.google.com/file/d/1jrOWhF9z16XFt169xUGtSbPrBNwkrSxL/view?usp=shari
 ## 🖥 Streamlit UI
 
 - Chat-style interface
+- User authentication (login/register)
+- User email displayed in sidebar
 - Sidebar role selection
 - Voice input button
-- Clear memory option
+- Clear memory option (user-specific)
+- Logout confirmation
 - Export conversation button
 
 ---
@@ -153,9 +161,19 @@ pip install -r requirements.txt
 
 ```bash
 GEMINI_API_KEY=your_api_key_here
+DB_HOST=localhost
+DB_USER=root
+DB_PASSWORD=your_db_password
+DB_NAME=friday_db
 ```
 
-### 5️⃣ Run the App
+### 5️⃣ Initialize Database
+
+```bash
+python db/init_db.py
+```
+
+### 6️⃣ Run the App
 
 ```bash
 streamlit run app.py
@@ -176,7 +194,6 @@ streamlit run app.py
 - Streaming LLM responses from API
 - PDF export
 - Voice output (Text-to-Speech)
-- Multi-session memory
 - Model switching (OpenRouter, Grok, etc.)
 
 ---
